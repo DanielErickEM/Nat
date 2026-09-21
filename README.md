@@ -1,11 +1,16 @@
-# Un jardín para Nataly 🌼
+# El universo de Nataly 🌻
 
-Una sorpresa para el 21 de septiembre, hecha con HTML, CSS y JavaScript, sin frameworks ni compilación.
+Una sola escena interactiva a pantalla completa, hecha únicamente con HTML, CSS y JavaScript. Sin frameworks, sin compilación y sin desplazamiento entre secciones.
 
-Incluye un jardín SVG animado, estrellas interactivas, cinco fotografías optimizadas, video, galería accesible, una carta y música instrumental generada con Web Audio al activarla.
+Galaxia con perspectiva, 1.700 partículas y 180 flores amarillas (girasoles, margaritas, rosas y tulipanes), estrellas, nebulosa, cinco fotos orbitando y un sol central dedicado a Nataly.
 
-## Ver y editar
+- Arrastrar o usar flechas al enfocar la galaxia para girar.
+- Pellizcar, usar la rueda o los botones +/− para acercar.
+- Tocar el universo o «Hazlo florecer» para descubrir mensajes y flores.
+- Tocar fotos para ampliarlas; carta y video se abren sobre la misma escena.
+- Música opcional al tocar su botón. Se pausa al reproducir el video.
+- Respeta movimiento reducido; «Reanudar movimiento» permite activarlo explícitamente.
 
-Abrir `index.html` en el navegador o servir esta carpeta con cualquier servidor estático. Los textos están en `index.html`, el diseño en `styles.css` y las interacciones en `script.js`.
+Abrir `index.html` o servir la carpeta con un servidor estático. GitHub Pages publica `main` desde la raíz.
 
-GitHub Pages publica la rama `main`, carpeta raíz. Las fotografías y el video pertenecen a sus respectivos titulares; no se concede permiso para reutilizarlos.
+Las fotografías y el video pertenecen a sus respectivos titulares; no se concede permiso para reutilizarlos.

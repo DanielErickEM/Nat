@@ -3,82 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101912">
+  <meta name="theme-color" content="#030309">
   <meta name="description" content="Nataly, este pequeño universo de flores amarillas es para ti. Feliz 21 de septiembre.">
-  <meta property="og:title" content="Un jardín para ti, Nataly 🌼">
+  <meta property="og:title" content="Un universo para ti, Nataly 🌼">
   <meta property="og:description" content="Hay personas que hacen florecer todo. Tú eres una de ellas. Una sorpresa para este 21 de septiembre.">
   <meta property="og:type" content="website">
-  <title>Para Nataly · Un poquito de primavera</title>
+  <title>Nataly · Mi universo de flores amarillas</title>
   <link rel="icon" type="image/svg+xml" href="assets/flor.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <script src="script.js" defer></script>
+  <link rel="stylesheet" href="styles.css?v=universe-2">
+  <script src="script.js?v=universe-2" defer></script>
 </head>
 <body>
-  <a class="skip-link" href="#inicio">Ir al contenido</a>
-  <canvas id="starlight" aria-hidden="true"></canvas>
-  <div class="grain" aria-hidden="true"></div>
-  <header class="header">
-    <a class="brand" href="#inicio" aria-label="Para Nataly, inicio"><img src="assets/flor.svg" alt="" width="30" height="30"> para Nataly<span class="brand-dot">.</span></a>
-    <nav aria-label="Navegación principal"><a href="#recuerdos">Recuerdos</a><a href="#carta">Una carta para ti <span>↗</span></a></nav>
-    <button class="sound-button" id="sound-toggle" aria-pressed="false" aria-label="Activar música"><span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span id="sound-label">Música</span></button>
-  </header>
-
-  <main>
-    <section class="hero" id="inicio" aria-labelledby="hero-title">
-      <div class="hero-copy">
-        <p class="eyebrow"><span class="little-line"></span> 21 DE SEPTIEMBRE <span class="small-star">✦</span> SOLO PARA TI</p>
-        <h1 id="hero-title">Hay personas<br>que son<br><em>primavera.</em></h1>
-        <p class="hero-dedication">Y tú, <span>Nataly</span>, eres la mía.</p>
-        <p class="hero-description">Si pudiera regalarte un pedacito de sol,<br>se parecería a esto. Un jardín de flores amarillas<br>que nunca se marchita, hecho pensando en ti.</p>
-        <button class="primary-button" id="bloom-button"><span>Estas flores son para ti</span><span aria-hidden="true">↗</span></button>
-        <p class="tiny-note"><span aria-hidden="true">✧</span> Tócalas. Hay un poquito de magia aquí.</p>
-      </div>
-      <div class="garden-scene" id="garden-scene">
-        <div class="sun-halo" aria-hidden="true"></div>
-        <div class="orbit orbit-one" aria-hidden="true"></div><div class="orbit orbit-two" aria-hidden="true"></div>
-        <span class="scene-star star-one" aria-hidden="true">✧</span><span class="scene-star star-two" aria-hidden="true">✦</span><span class="scene-star star-three" aria-hidden="true">✧</span>
-        <div class="garden-art" id="garden-art" aria-hidden="true"></div>
-        <button class="floating-photo photo-one" data-photo="0" aria-label="Ampliar retrato de Nataly"><img src="assets/nataly-1.webp" alt="Retrato de Nataly en blanco y negro" width="220" height="290" fetchpriority="high"><span>mi persona bonita ♡</span></button>
-        <button class="floating-photo photo-two" data-photo="4" aria-label="Ampliar foto de Nataly al aire libre"><img src="assets/nataly-5.webp" alt="Nataly al aire libre" width="220" height="290"><span>un rayito de sol</span></button>
-        <div class="garden-label"><span class="label-star">✳</span><span>Un pequeño universo<br><strong>en el que tú eres el sol.</strong></span></div>
-        <p class="bloom-message" id="bloom-message" role="status"></p>
-      </div>
-      <div class="hero-bottom"><span>HECHO CON CARIÑO, PARA TU SONRISA</span><a href="#recuerdos">La magia sigue abajo <span aria-hidden="true">↓</span></a><span class="edition">EDICIÓN 21.09 <span aria-hidden="true">✳</span></span></div>
-    </section>
-
-    <section class="memories section-pad" id="recuerdos" aria-labelledby="memories-title">
-      <div class="section-heading reveal"><div><p class="eyebrow">01 / MIS FAVORITAS</p><h2 id="memories-title">Tú, en todas tus<br><em>formas de brillar.</em></h2></div><p>No hace falta una ocasión especial para<br>pensar en ti. Pero hoy quería recordarte<br>lo bonito que es que existas.</p></div>
-      <div class="photo-strip">
-        <button class="memory-card reveal" data-photo="0"><span class="photo-wrap"><img src="assets/nataly-1.webp" alt="Nataly, retrato en blanco y negro" loading="lazy" width="450" height="600"><span class="expand-icon" aria-hidden="true">↗</span></span><span class="photo-caption"><span>01</span> Tu luz, incluso en blanco y negro.</span></button>
-        <button class="memory-card reveal" data-photo="1"><span class="photo-wrap"><img src="assets/nataly-2.webp" alt="Nataly en una salida de noche" loading="lazy" width="450" height="600"><span class="expand-icon" aria-hidden="true">↗</span></span><span class="photo-caption"><span>02</span> Esa mirada que me encanta.</span></button>
-        <button class="memory-card reveal" data-photo="2"><span class="photo-wrap"><img src="assets/nataly-3.webp" alt="Nataly frente al espejo" loading="lazy" width="450" height="600"><span class="expand-icon" aria-hidden="true">↗</span></span><span class="photo-caption"><span>03</span> Tan tú. Tan bonita.</span></button>
-        <button class="memory-card reveal" data-photo="3"><span class="photo-wrap"><img src="assets/nataly-4.webp" alt="Nataly sonriendo en una foto frente al espejo" loading="lazy" width="450" height="600"><span class="expand-icon" aria-hidden="true">↗</span></span><span class="photo-caption"><span>04</span> Mi forma favorita de alegrar el día.</span></button>
-        <button class="memory-card reveal" data-photo="4"><span class="photo-wrap"><img src="assets/nataly-5.webp" alt="Nataly disfrutando de un día al aire libre" loading="lazy" width="450" height="600"><span class="expand-icon" aria-hidden="true">↗</span></span><span class="photo-caption"><span>05</span> Un poquito de sol hecho persona.</span></button>
-      </div>
-      <div class="gallery-bottom"><p>Unas cuantas fotos. Infinitas razones para sonreír.</p><div class="gallery-controls"><button id="photos-prev" aria-label="Ver fotos anteriores">←</button><button id="photos-next" aria-label="Ver fotos siguientes">→</button></div></div>
-    </section>
-
-    <section class="video-section section-pad" aria-labelledby="video-title">
-      <div class="video-copy reveal"><p class="eyebrow">02 / UN INSTANTE CONTIGO</p><h2 id="video-title">Hay momentos que<br>dan ganas de ver<br><em>una y otra vez.</em></h2><p>Y luego estás tú, convirtiendo un instante<br>cualquiera en mi parte favorita del día.</p><span class="handwritten">Este es uno de esos. <span aria-hidden="true">⤵</span></span><button class="text-button" id="play-memory">Reproducir este recuerdo <span aria-hidden="true">▷</span></button></div>
-      <div class="video-frame reveal"><div class="video-orbit" aria-hidden="true"></div><div class="video-container"><video id="memory-video" controls playsinline preload="none" poster="assets/video-poster.webp" aria-label="Video de Nataly al aire libre"><source src="assets/nataly.mp4" type="video/mp4">Tu navegador no puede reproducir este video. <a href="assets/nataly.mp4">Abrir el video</a>.</video></div><span class="video-sticker" aria-hidden="true">you are<br><em>my sunshine</em> ☀</span></div>
-    </section>
-
-    <section class="letter-section section-pad" id="carta" aria-labelledby="letter-title">
-      <div class="letter-stars" aria-hidden="true">✧ <span>✦</span> ✧</div>
-      <p class="eyebrow reveal">03 / ALGO QUE QUERÍA DECIRTE</p><h2 id="letter-title" class="reveal">Las flores son una excusa.<br><em>La razón eres tú.</em></h2>
-      <p class="reveal">Guardé unas palabras para ti. Ábrelas despacito.</p>
-      <button class="envelope reveal" id="open-letter" aria-label="Abrir la carta para Nataly"><span class="envelope-flap"></span><span class="envelope-paper">Para ti, Nataly ♡</span><span class="envelope-front"></span><span class="wax-seal">N</span></button>
-      <button class="text-button" id="open-letter-text">Abrir mi carta <span aria-hidden="true">↗</span></button>
-      <p class="closing-line">Ojalá la vida te devuelva todas las flores que haces crecer en los demás.</p>
-    </section>
+  <main id="universe" aria-label="Universo interactivo de flores amarillas para Nataly">
+    <canvas tabindex="0" id="cosmos" aria-label="Galaxia de girasoles, margaritas, rosas y tulipanes amarillos. Arrastra o usa las flechas del teclado para girar. Usa los botones para acercar." role="img"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+    <header class="dedication"><p>21 DE SEPTIEMBRE <span>✦</span> SOLO PARA TI</p><h1>Un universo de flores <em>para ti.</em></h1><p class="subtitle">Porque todas las cosas bonitas me recuerdan a ti.</p></header>
+    <div id="orbit-photos" aria-label="Fotos de Nataly orbitando entre flores"></div>
+    <div class="sun-name" aria-hidden="true"><span>Nataly</span><small>MI SOL ENTRE MILLONES DE ESTRELLAS</small></div>
+    <p id="wish" role="status" aria-live="polite"></p>
+    <aside class="view-controls" aria-label="Controles del universo"><button id="zoom-in" aria-label="Acercar universo">+</button><button id="zoom-out" aria-label="Alejar universo">−</button><button id="reset-view" aria-label="Restablecer vista">⟲</button><button id="pause-motion" aria-label="Pausar movimiento" aria-pressed="false">Ⅱ</button></aside>
+    <footer class="controls"><p class="hint"><span>✧</span> Arrastra para explorar · Toca las flores y las fotos</p><div class="control-dock"><button id="bloom-button" class="bloom-control"><img src="assets/flor.svg" alt="" width="21" height="21"><span>Hazlo florecer</span></button><span class="separator"></span><button id="open-letter" aria-label="Abrir carta para Nataly"><span class="control-icon" aria-hidden="true">♡</span><span>Para ti</span></button><button id="open-video" aria-label="Ver video de Nataly"><span class="control-icon" aria-hidden="true">▷</span><span>Recuerdo</span></button><button id="sound-toggle" aria-pressed="false" aria-label="Activar música"><span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span id="sound-label">Música</span></button></div><p class="bottom-note">En cualquier galaxia, te elegiría a ti. <span>♡</span></p></footer>
   </main>
-  <footer><a class="brand" href="#inicio"><img src="assets/flor.svg" alt="" width="25" height="25"> para Nataly.</a><p>Un poquito de primavera. Todo mi cariño.</p><span>21 SEPTIEMBRE <span aria-hidden="true">♡</span></span></footer>
-
-  <dialog id="photo-dialog" class="photo-dialog" aria-label="Galería de fotos de Nataly"><button class="dialog-close" data-close aria-label="Cerrar foto">×</button><figure><img id="lightbox-image" src="assets/nataly-1.webp" alt=""><figcaption id="lightbox-caption"></figcaption></figure><div class="lightbox-controls"><button id="lightbox-prev" aria-label="Foto anterior">←</button><span id="photo-count">1 / 5</span><button id="lightbox-next" aria-label="Foto siguiente">→</button></div></dialog>
-  <dialog id="letter-dialog" class="letter-dialog" aria-labelledby="letter-dialog-title"><button class="dialog-close" data-close aria-label="Cerrar carta">×</button><article><img class="letter-flower" src="assets/flor.svg" alt="" width="46" height="46"><p class="eyebrow">21 DE SEPTIEMBRE · PARA TI</p><h2 id="letter-dialog-title">Mi bonita <em>Nataly,</em></h2><p>Hoy quería regalarte flores amarillas. Pero también quería regalarte algo que pudieras guardar, abrir cuando quisieras y encontrar siempre aquí.</p><p>Así que hice este pequeño jardín para ti. Con tus fotos, con un poquito de magia y con todo ese cariño que a veces no cabe en un mensaje.</p><p>Me gusta tu manera de ser, tu sonrisa y esa forma tan tuya de hacer más bonito un día cualquiera. Ojalá, al ver esto, sonrías aunque sea un poquito. Esa era la idea desde el principio.</p><p>Que nunca te falten motivos para brillar, sueños que te emocionen y personas que te cuiden bonito. Y que, incluso en los días grises, recuerdes que para alguien tú eres un rayito de sol.</p><p class="letter-signature">Estas flores son para ti.<br>Hoy, y cada vez que vuelvas aquí. ♡</p><span class="letter-postscript">Con mucho cariño, de mí para ti.</span></article></dialog>
-  <noscript><p class="noscript-note">Activa JavaScript para hacer florecer el jardín, ampliar las fotos y abrir la carta. El video y los recuerdos están disponibles más arriba.</p></noscript>
+  <dialog id="photo-dialog" class="photo-dialog" aria-label="Fotos de Nataly"><button class="dialog-close" data-close aria-label="Cerrar foto">×</button><figure><img id="lightbox-image" src="assets/nataly-1.webp" alt="Nataly"><figcaption id="lightbox-caption"></figcaption></figure><div class="lightbox-controls"><button id="lightbox-prev" aria-label="Foto anterior">←</button><span id="photo-count">1 / 5</span><button id="lightbox-next" aria-label="Foto siguiente">→</button></div></dialog>
+  <dialog id="video-dialog" class="video-dialog" aria-label="Un recuerdo de Nataly"><button class="dialog-close" data-close aria-label="Cerrar video">×</button><video id="memory-video" controls playsinline preload="none" poster="assets/video-poster.webp" aria-label="Video de Nataly al aire libre"><source src="assets/nataly.mp4" type="video/mp4"></video><p>Mi parte favorita de cualquier universo. ♡</p></dialog>
+<dialog id="letter-dialog" class="letter-dialog" aria-labelledby="letter-dialog-title"><button class="dialog-close" data-close aria-label="Cerrar carta">×</button><article><img class="letter-flower" src="assets/flor.svg" alt="" width="46" height="46"><p class="eyebrow">21 DE SEPTIEMBRE · PARA TI</p><h2 id="letter-dialog-title">Mi bonita <em>Nataly,</em></h2><p>Hoy quería regalarte flores amarillas. Pero también quería regalarte algo que pudieras guardar, abrir cuando quisieras y encontrar siempre aquí.</p><p>Así que hice este pequeño universo para ti. Con tus fotos, con un poquito de magia y con todo ese cariño que a veces no cabe en un mensaje.</p><p>Me gusta tu manera de ser, tu sonrisa y esa forma tan tuya de hacer más bonito un día cualquiera. Ojalá, al ver esto, sonrías aunque sea un poquito. Esa era la idea desde el principio.</p><p>Que nunca te falten motivos para brillar, sueños que te emocionen y personas que te cuiden bonito. Y que, incluso en los días grises, recuerdes que para alguien tú eres un rayito de sol.</p><p class="letter-signature">Estas flores son para ti.<br>Hoy, y cada vez que vuelvas aquí. ♡</p><span class="letter-postscript">Con mucho cariño, de mí para ti.</span></article></dialog>
+<noscript><p class="noscript-note">Activa JavaScript para entrar a tu universo de flores amarillas, Nataly. ♡</p></noscript>
 </body>
 </html>
