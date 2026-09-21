@@ -1,31 +1,30 @@
 'use strict';
-const $ = s => document.querySelector(s);
-const clamp = (n,a,b) => Math.min(b,Math.max(a,n));
-const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
-let reducedMotion = motionQuery.matches, paused = reducedMotion;
-const canvas = $('#cosmos'), ctx = canvas.getContext('2d');
-const backdrop = document.createElement('canvas'), back = backdrop.getContext('2d');
+const $=s=>document.querySelector(s);
+const clamp=(n,a,b)=>Math.min(b,Math.max(a,n));
+const motionQuery=matchMedia('(prefers-reduced-motion: reduce)');
+let reducedMotion=motionQuery.matches,paused=false;
+const canvas=$('#cosmos'),ctx=canvas.getContext('2d');
+const backdrop=document.createElement('canvas'),back=backdrop.getContext('2d');
 let w=0,h=0,base=0,dpr=1,raf=null,lastTime=0,clock=0,boost=0;
-let yaw=.25,tilt=.62,roll=-.20,zoom=1;
-let dragging=false,moved=false,lastX=0,lastY=0;
-const pointers=new Map(); let pinchDistance=0;
-const photos=[
+let yaw=.25,tilt=.75,roll=-.20,zoom=1;
+const memories=[
  ['assets/nataly-1.webp','Tu luz, incluso en blanco y negro.'],
  ['assets/nataly-2.webp','Esa mirada que me encanta.'],
  ['assets/nataly-3.webp','Tan tú. Tan bonita.'],
  ['assets/nataly-4.webp','Mi forma favorita de alegrar el día.'],
- ['assets/nataly-5.webp','Un poquito de sol hecho persona.']
+ ['assets/nataly-5.webp','Un poquito de sol hecho persona.'],
+ ['assets/nataly.mp4','Tu sonrisa hace más bonito mi universo.']
 ];
-const photoButtons=photos.map((photo,i)=>{
- const button=document.createElement('button');button.className='orbit-photo';button.dataset.photo=i;
- button.setAttribute('aria-label',`Ampliar foto ${i+1} de Nataly`);
- const img=document.createElement('img');img.src=photo[0];img.alt=photo[1];img.draggable=false;
- button.append(img);$('#orbit-photos').append(button);
- button.addEventListener('click',()=>{showPhoto(i);openDialog($('#photo-dialog'),button)});
- return button;
+let video;
+const orbitMemories=memories.map(([src,description],i)=>{
+ const figure=document.createElement('figure');figure.className='orbit-memory';
+ let media;
+ if(i===5){
+  media=document.createElement('video');media.id='memory-video';media.muted=true;media.defaultMuted=true;media.autoplay=true;media.loop=true;media.playsInline=true;media.preload='auto';media.poster='assets/video-poster.webp';
+  media.setAttribute('muted','');media.setAttribute('autoplay','');media.setAttribute('playsinline','');media.setAttribute('loop','');media.setAttribute('aria-label',description);figure.classList.add('video-memory');video=media;
+ }else{media=document.createElement('img');media.alt=description;media.draggable=false}
+ media.src=src;figure.append(media);$('#orbit-photos').append(figure);return figure;
 });
-
-// Small reusable canvas sprites: sunflower, daisy, rose and tulip, all golden.
 function flowerSprite(type){
  const sprite=document.createElement('canvas');sprite.width=sprite.height=160;
  const c=sprite.getContext('2d');c.translate(80,80);
@@ -51,17 +50,26 @@ function flowerSprite(type){
  return sprite;
 }
 const sprites=[0,1,2,3].map(flowerSprite);
-const spriteURLs=sprites.map(s=>s.toDataURL());
-const dust=Array.from({length:1700},()=>({a:Math.random()*Math.PI*2,r:.56+Math.random()*1.13,y:(Math.random()-.5)*.11,size:Math.random()*1.4+.3,phase:Math.random()*6}));
-const flowers=Array.from({length:180},(_,i)=>({a:Math.random()*Math.PI*2,r:.67+Math.random()*.98,y:(Math.random()-.5)*.20,size:9+Math.random()*18,type:i%4,rot:Math.random()*6}));
-const wishes=['En cualquier universo, te elegiría a ti. ♡','Todas estas flores son para ti, Nataly.','Eres mi sol entre millones de estrellas.','Que nunca te falten flores ni motivos para sonreír.','Mi universo florece contigo.','Feliz 21 de septiembre, mi bonita.'];
-let wishIndex=0,wishTimer,photoIndex=0,dialogOpener;
+const dust=Array.from({length:2100},()=>({a:Math.random()*Math.PI*2,r:.55+Math.random()*1.18,y:(Math.random()-.5)*.13,size:Math.random()*1.5+.3,phase:Math.random()*6}));
+const flowers=Array.from({length:220},(_,i)=>({a:Math.random()*Math.PI*2,r:.67+Math.random()*1.02,y:(Math.random()-.5)*.2,size:12+Math.random()*21,type:i%4,rot:Math.random()*6}));
+const floatingFlowers=Array.from({length:16},(_,i)=>({x:Math.random(),y:Math.random(),size:14+Math.random()*25,speed:.008+Math.random()*.012,type:i%4,phase:Math.random()*6}));
+const wishes=[
+ ['Todas las flores del universo,','hoy son para ti.'],
+ ['Entre millones de estrellas,','mi sol siempre eres tú.'],
+ ['Tu sonrisa hace florecer','hasta mis días más grises.'],
+ ['Girasoles, rosas y mil flores…','ninguna tan bonita como tú.'],
+ ['Ojalá la vida te cuide','tan bonito como mereces.'],
+ ['En esta galaxia y en todas,','te elegiría a ti.'],
+ ['Que nunca te falten flores,','ni motivos para sonreír.'],
+ ['Feliz 21 de septiembre,','mi bonita Nataly. ♡']
+];
+let currentWish=0;
 function randomNormal(){return Math.sqrt(-2*Math.log(Math.max(.0001,Math.random())))*Math.cos(2*Math.PI*Math.random())}
 function resize(){
  const rect=canvas.getBoundingClientRect();w=rect.width;h=rect.height;dpr=Math.min(devicePixelRatio||1,2);
  canvas.width=w*dpr;canvas.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
  backdrop.width=w*dpr;backdrop.height=h*dpr;back.setTransform(dpr,0,0,dpr,0,0);
- base=Math.min(w*.32,h*.41);
+ base=Math.min(w*.30,h*.34);
  // A diagonal nebula and distant stars are baked once, not regenerated each frame.
  back.clearRect(0,0,w,h);
  back.save();back.translate(w*.5,h*.46);back.rotate(-.85);
@@ -82,10 +90,10 @@ function project(a,r,y=0){
  const yy=y*Math.cos(tilt)-z*Math.sin(tilt),zz=y*Math.sin(tilt)+z*Math.cos(tilt);
  const xx=x*Math.cos(roll)-yy*Math.sin(roll),yyy=x*Math.sin(roll)+yy*Math.cos(roll);
  const p=4.7/(4.7+zz);
- return{x:w*.5+xx*base*zoom*p,y:h*.49+yyy*base*zoom*p,z:zz,p};
+ return{x:w*.5+xx*base*zoom*p,y:h*.44+yyy*base*zoom*p,z:zz,p};
 }
 function drawSun(){
- const x=w*.5,y=h*.49,r=clamp(base*.25,37,82)*Math.sqrt(zoom);
+ const x=w*.5,y=h*.44,r=clamp(base*.25,37,82)*Math.sqrt(zoom);
  let g=ctx.createRadialGradient(x,y,r*.2,x,y,r*3.6);g.addColorStop(0,'#ffd15640');g.addColorStop(.35,'#ed9f241c');g.addColorStop(1,'#ffc93400');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r*3.6,0,7);ctx.fill();
  ctx.save();ctx.translate(x,y);ctx.rotate(clock*.025);ctx.globalAlpha=.8;ctx.drawImage(sprites[0],-r*1.55,-r*1.55,r*3.1,r*3.1);ctx.restore();
  g=ctx.createRadialGradient(x-r*.3,y-r*.3,0,x,y,r*.82);g.addColorStop(0,'#9e762cee');g.addColorStop(.65,'#684510ed');g.addColorStop(1,'#c39532cc');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r*.82,0,7);ctx.fill();
@@ -97,62 +105,59 @@ function drawFlower(f,p){
 }
 function render(){
  ctx.clearRect(0,0,w,h);ctx.drawImage(backdrop,0,0,w,h);
- const glow=ctx.createRadialGradient(w*.5,h*.49,0,w*.5,h*.49,base*1.9);glow.addColorStop(0,'#b9871910');glow.addColorStop(.5,`rgba(175,116,20,${.035+boost*.025})`);glow.addColorStop(1,'#ac862000');ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);
- for(const r of [.64,.98,1.31,1.68]){ctx.beginPath();for(let i=0;i<=160;i++){const p=project(i/160*Math.PI*2,r);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y)}ctx.strokeStyle='#d3b04c1c';ctx.lineWidth=.65;ctx.stroke()}
- for(const d of dust){const p=project(d.a,d.r,d.y);const alpha=clamp((.35+Math.sin(clock*.7+d.phase)*.13-p.z*.09)+boost*.16,.08,.9);ctx.fillStyle=`rgba(255,${190+Math.floor(d.r*28)},100,${alpha})`;const size=d.size*p.p;ctx.fillRect(p.x,p.y,size,size)}
+ const pulse=1+Math.sin(clock*.7)*.08;
+ const glow=ctx.createRadialGradient(w*.5,h*.44,0,w*.5,h*.44,base*1.9*pulse);
+ glow.addColorStop(0,'#b9871920');glow.addColorStop(.5,'#af74100d');glow.addColorStop(1,'#ac862000');ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);
+ for(const r of [.64,.98,1.31,1.7]){ctx.beginPath();for(let i=0;i<=128;i++){const p=project(i/128*Math.PI*2,r);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y)}ctx.strokeStyle='#d3b04c24';ctx.lineWidth=.6;ctx.stroke()}
+ for(const d of dust){const p=project(d.a,d.r,d.y),alpha=clamp(.42+Math.sin(clock*.7+d.phase)*.16-p.z*.09,.08,.9);ctx.fillStyle=`rgba(255,${190+Math.floor(d.r*28)},100,${alpha})`;const size=d.size*p.p;ctx.fillRect(p.x,p.y,size,size)}
  const sorted=flowers.map(f=>({f,p:project(f.a,f.r,f.y)})).sort((a,b)=>b.p.z-a.p.z);
  for(const o of sorted)if(o.p.z>=0)drawFlower(o.f,o.p);
  drawSun();
  for(const o of sorted)if(o.p.z<0)drawFlower(o.f,o.p);
- // Photos travel along a wider orbit and remain real, keyboard-accessible buttons.
- photoButtons.forEach((button,i)=>{
-  const p=project(i/5*Math.PI*2+.15,1.35,i%2===0?.25:-.14);
-  const size=(w<600?53:76)*clamp(p.p,.8,1.2)*Math.sqrt(zoom),bh=size*1.27;
-  const px=clamp(p.x, size/2+10,w-size/2-10),py=clamp(p.y,bh/2+145,h-bh/2-145);
-  button.style.width=`${size}px`;button.style.height=`${bh}px`;
-  button.style.transform=`translate3d(${px-size/2}px,${py-bh/2}px,0) rotate(${Math.sin(i*2+clock*.07)*9}deg)`;
-  button.style.zIndex=String(Math.round(20-p.z*5));button.style.opacity=String(clamp(.92-p.z*.12,.6,1));
+ // Every memory, including the muted looping video, is already in the scene.
+ orbitMemories.forEach((figure,i)=>{
+  const p=project(i/6*Math.PI*2+.15,1.4,i%2===0?.26:-.18);
+  const size=(w<600?58:83)*clamp(p.p,.82,1.3),fh=size*1.3;
+  const px=clamp(p.x,size/2+9,w-size/2-9),py=clamp(p.y,fh/2+75,h*.73-fh/2);
+  figure.style.width=`${size}px`;figure.style.height=`${fh}px`;
+  figure.style.transform=`translate3d(${px-size/2}px,${py-fh/2}px,0) rotate(${Math.sin(i*2+clock*.09)*7}deg)`;
+  figure.style.zIndex=String(Math.round(20-p.z*5));figure.style.opacity=String(clamp(.94-p.z*.10,.68,1));
  });
- if(!reducedMotion&&!paused){const period=clock%13;if(period<1.15){const t=period/1.15,x=w*(.2+t*.6),y=h*(.1+t*.2);const g=ctx.createLinearGradient(x-75,y-35,x,y);g.addColorStop(0,'#fff0cc00');g.addColorStop(1,'#fff0ccaa');ctx.strokeStyle=g;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x-75,y-35);ctx.lineTo(x,y);ctx.stroke()}}
+ for(const f of floatingFlowers){
+  const y=((f.y-clock*f.speed*(reducedMotion?.3:1))%1+1)%1;
+  const x=f.x*w+Math.sin(clock*.16+f.phase)*18;
+  ctx.save();ctx.translate(x,y*h);ctx.rotate(f.phase+clock*.12);ctx.globalAlpha=.14+Math.sin(y*Math.PI)*.22;const size=f.size*(w<600?.72:1);ctx.drawImage(sprites[f.type],-size/2,-size/2,size,size);ctx.restore();
+ }
+ if(!reducedMotion){const period=clock%14;if(period>10&&period<11.1){const t=(period-10)/1.1,x=w*(.1+t*.6),y=h*(.1+t*.2);const g=ctx.createLinearGradient(x-80,y-30,x,y);g.addColorStop(0,'#fff0cc00');g.addColorStop(1,'#fff0ccbb');ctx.strokeStyle=g;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x-80,y-30);ctx.lineTo(x,y);ctx.stroke()}}
+}
+function updateMessage(){
+ const index=Math.floor(clock/9)%wishes.length,phase=clock%9;
+ const el=$('#wish');
+ // Fade out before the next thought, then display it without a click or a new page.
+ el.classList.toggle('fading',phase>7.8);
+ if(index!==currentWish){currentWish=index;el.replaceChildren(document.createTextNode(wishes[index][0]),document.createElement('br'));const em=document.createElement('em');em.textContent=wishes[index][1];el.append(em)}
 }
 function frame(time){
- const dt=lastTime?Math.min((time-lastTime)/1000,.04):0;lastTime=time;
- if(!paused&&!reducedMotion&&!dragging&&!document.querySelector('dialog[open]')&&!document.querySelector('.orbit-photo:focus-visible')&&!document.querySelector('.orbit-photo:hover')){clock+=dt;yaw+=dt*.045}
- boost=Math.max(0,boost-dt*.42);render();raf=requestAnimationFrame(frame);
+ const dt=lastTime?Math.min((time-lastTime)/1000,.05):0;lastTime=time;
+ clock+=dt;yaw+=dt*(reducedMotion?.045:.105);
+ tilt=.75+Math.sin(clock*.065)*(reducedMotion?.035:.16);
+ roll=-.20+Math.sin(clock*.045)*(reducedMotion?.025:.09);
+ boost=.25+Math.sin(clock*.6)*.25;
+ render();updateMessage();raf=requestAnimationFrame(frame);
 }
-function restart(){if(raf!==null)cancelAnimationFrame(raf);raf=null;lastTime=0;if(!document.hidden&&!paused&&!reducedMotion)raf=requestAnimationFrame(frame);else render()}
-function updatePause(){const b=$('#pause-motion');b.setAttribute('aria-pressed',String(paused));b.setAttribute('aria-label',paused?'Reanudar movimiento':'Pausar movimiento');b.textContent=paused?'▷':'Ⅱ';restart()}
-function setZoom(value){zoom=clamp(value,.65,1.7);$('#zoom-in').disabled=zoom>=1.7;$('#zoom-out').disabled=zoom<=.65;render()}
-$('#zoom-in').addEventListener('click',()=>setZoom(zoom+.15));$('#zoom-out').addEventListener('click',()=>setZoom(zoom-.15));
-$('#reset-view').addEventListener('click',()=>{yaw=.25;tilt=.62;roll=-.20;setZoom(1)});
-$('#pause-motion').addEventListener('click',()=>{paused=!paused;if(!paused)reducedMotion=false;updatePause()});
-canvas.addEventListener('pointerdown',e=>{pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});canvas.setPointerCapture(e.pointerId);dragging=true;moved=false;lastX=e.clientX;lastY=e.clientY;if(pointers.size===2){const p=[...pointers.values()];pinchDistance=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y)}});
-canvas.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){const p=[...pointers.values()],distance=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);if(pinchDistance>0)setZoom(zoom*distance/pinchDistance);pinchDistance=distance;moved=true}else{const dx=e.clientX-lastX,dy=e.clientY-lastY;if(Math.abs(dx)+Math.abs(dy)>2)moved=true;yaw+=dx*.005;tilt=clamp(tilt+dy*.005,.12,1.5);lastX=e.clientX;lastY=e.clientY;render()}});
-function releasePointer(e,cancelled=false){if(!pointers.has(e.pointerId))return;pointers.delete(e.pointerId);if(!moved&&!cancelled&&pointers.size===0){burst(e.clientX,e.clientY,12);showWish()}dragging=pointers.size>0;if(dragging){const p=[...pointers.values()][0];lastX=p.x;lastY=p.y}}
-canvas.addEventListener('pointerup',e=>releasePointer(e));canvas.addEventListener('pointercancel',e=>releasePointer(e,true));
-canvas.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();if(e.key==='ArrowLeft')yaw-=.13;if(e.key==='ArrowRight')yaw+=.13;if(e.key==='ArrowUp')tilt=clamp(tilt+.1,.12,1.5);if(e.key==='ArrowDown')tilt=clamp(tilt-.1,.12,1.5);render()}});
-canvas.addEventListener('wheel',e=>{e.preventDefault();setZoom(zoom-e.deltaY*.0006)},{passive:false});
-function showWish(){const el=$('#wish');el.textContent=wishes[wishIndex++%wishes.length];el.classList.add('visible');clearTimeout(wishTimer);wishTimer=setTimeout(()=>el.classList.remove('visible'),5500)}
-function burst(x=w/2,y=h*.49,count=36){
- if(reducedMotion)return;boost=1.5;
- for(let i=0;i<count;i++){const el=document.createElement('img');el.src=spriteURLs[i%4];el.alt='';el.className='burst-flower';const a=Math.random()*Math.PI*2,r=70+Math.random()*Math.min(w,h)*.55;el.style.cssText=`--x:${x}px;--y:${y}px;--size:${20+Math.random()*24}px;--dx:${Math.cos(a)*r}px;--dy:${Math.sin(a)*r}px;--turn:${Math.random()*360}deg`;document.body.append(el);el.addEventListener('animationend',()=>el.remove(),{once:true});setTimeout(()=>el.remove(),3200)}
- render();
+async function playVideo(){try{await video.play()}catch{/* Some battery-saving modes block even muted autoplay; the poster stays visible. */}}
+function restart(){
+ if(raf!==null)cancelAnimationFrame(raf);raf=null;lastTime=0;
+ if(!document.hidden&&!paused){raf=requestAnimationFrame(frame);playVideo()}else{video.pause();render()}
 }
-$('#bloom-button').addEventListener('click',()=>{burst();showWish()});
-function showPhoto(index){photoIndex=(index+photos.length)%photos.length;$('#lightbox-image').src=photos[photoIndex][0];$('#lightbox-image').alt=`Nataly. ${photos[photoIndex][1]}`;$('#lightbox-caption').textContent=photos[photoIndex][1];$('#photo-count').textContent=`${photoIndex+1} / 5`}
-function openDialog(dialog,trigger){dialogOpener=trigger;dialog.showModal()}
-$('#lightbox-prev').addEventListener('click',()=>showPhoto(photoIndex-1));$('#lightbox-next').addEventListener('click',()=>showPhoto(photoIndex+1));
-$('#photo-dialog').addEventListener('keydown',e=>{if(e.key==='ArrowRight'){e.preventDefault();showPhoto(photoIndex+1)}if(e.key==='ArrowLeft'){e.preventDefault();showPhoto(photoIndex-1)}});
-$('#open-letter').addEventListener('click',e=>openDialog($('#letter-dialog'),e.currentTarget));
-const video=$('#memory-video');
-$('#open-video').addEventListener('click',async e=>{openDialog($('#video-dialog'),e.currentTarget);try{await video.play()}catch{video.focus()}});
-document.querySelectorAll('dialog').forEach(dialog=>{
- dialog.querySelector('[data-close]').addEventListener('click',()=>dialog.close());
- dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close()}});
- dialog.addEventListener('close',()=>{video.pause();dialogOpener?.focus({preventScroll:true})});
+$('#pause-motion').addEventListener('click',()=>{
+ paused=!paused;const button=$('#pause-motion');button.setAttribute('aria-pressed',String(paused));button.setAttribute('aria-label',paused?'Reanudar animación':'Pausar animación');button.textContent=paused?'▷':'Ⅱ';restart();
 });
-window.addEventListener('resize',resize);motionQuery.addEventListener('change',e=>{reducedMotion=e.matches;paused=reducedMotion;updatePause()});
-resize();updatePause();
+window.addEventListener('resize',resize);
+motionQuery.addEventListener('change',e=>{reducedMotion=e.matches});
+// Automatic from the first frame. Reduced-motion devices get a gentler orbit.
+resize();restart();
+document.addEventListener('pointerdown',()=>{if(!paused&&video.paused)playVideo()},{once:true});
 // A soft original music-box sequence. Audio starts only after an explicit tap.
 let audioContext, musicTimer, musicPlaying = false, noteIndex = 0, activeNotes = new Set();
 const melody = [72, 76, 79, 83, 81, 79, 76, 74, 72, 76, 79, 86, 84, 79, 76, 74, 69, 72, 76, 81, 79, 76, 74, 72, 67, 71, 74, 79, 76, 74, 72, null];
@@ -175,9 +180,8 @@ $('#sound-toggle').addEventListener('click', async () => {
   if (musicPlaying) { stopMusic(); return; }
   try {
     audioContext ??= new (window.AudioContext || window.webkitAudioContext)(); await audioContext.resume();
-    $('#memory-video').pause(); musicPlaying = true; musicStep(); musicTimer = setInterval(musicStep, 610);
+    musicPlaying = true; musicStep(); musicTimer = setInterval(musicStep, 610);
     $('#sound-toggle').setAttribute('aria-pressed', 'true'); $('#sound-toggle').setAttribute('aria-label', 'Pausar música'); $('#sound-label').textContent = 'Pausar';
   } catch { $('#sound-label').textContent = 'Sin audio'; $('#sound-toggle').setAttribute('aria-label', 'Audio no disponible en este navegador'); }
 });
-video.addEventListener('play',()=>{if(musicPlaying)stopMusic()});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){stopMusic();video.pause()}restart()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stopMusic();restart()});
