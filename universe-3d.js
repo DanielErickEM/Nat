@@ -161,7 +161,7 @@ export async function startUniverse() {
       const bar = new T.Mesh(new T.BoxGeometry(sx, sy, .075), frameMaterial); bar.position.set(x, y, .025); card.add(bar);
     }
     const imageUrl = i === 5 ? 'assets/video-poster.webp' : `assets/nataly-${i + 1}.webp`;
-    mediaPromises.push(loader.loadAsync(imageUrl).then(texture => { cropTexture(texture, texture.image.width / texture.image.height); frontMaterial.map = texture; frontMaterial.needsUpdate = true; }).catch(() => { frontMaterial.color.set('#8d7240'); }));
+    mediaPromises.push(loader.loadAsync(imageUrl).then(texture => { if (frontMaterial.map?.isVideoTexture) { texture.dispose(); return; } cropTexture(texture, texture.image.width / texture.image.height); frontMaterial.map = texture; frontMaterial.needsUpdate = true; }).catch(() => { frontMaterial.color.set('#8d7240'); }));
     if (i === 5) {
       video.addEventListener('loadeddata', () => { const texture = new T.VideoTexture(video); cropTexture(texture, video.videoWidth / video.videoHeight); frontMaterial.map?.dispose(); frontMaterial.map = texture; frontMaterial.needsUpdate = true; }, { once: true });
     } else {
